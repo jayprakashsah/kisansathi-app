@@ -22,6 +22,7 @@ const MAPPING = {
   'chart.bar.fill': 'bar-chart',
   'leaf.fill': 'eco',
   'gamecontroller.fill': 'gamepad',
+  'clock.fill': 'history',
 } as IconMapping;
 
 /**

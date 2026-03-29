@@ -18,9 +18,39 @@ export default function ProfileScreen() {
   useEffect(() => {
     const loadUserData = async () => {
       try {
+        const token = await SecureStore.getItemAsync('userToken');
+        if (token) {
+          try {
+            const res = await fetch("http://172.16.149.4:8000/user/profile", {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.name) setUserName(data.name);
+              if (data.phone) setUserPhone(data.phone);
+              if (data.email && !data.phone) setUserPhone(data.email); 
+              if (data.photo_base64) setUserPhoto(data.photo_base64);
+              
+              // Cache locally
+              const userId = (data.phone || data.email || data.name || 'default').replace(/[^a-zA-Z0-9.\-_]/g, '_');
+              if (data.photo_base64) await SecureStore.setItemAsync(`userPhoto_${userId}`, data.photo_base64);
+              
+              setLoading(false);
+              return;
+            }
+          } catch (cloudErr) {
+            console.log("Cloud unavailable, failing over to local vault.");
+          }
+        }
+
+        // Local Fallback
         const name = await SecureStore.getItemAsync('userName');
         const phone = await SecureStore.getItemAsync('userPhone');
-        const photo = await SecureStore.getItemAsync('userPhoto'); // load photo if saved
+        
+        const rawUserId = phone || name || 'default';
+        const userId = rawUserId.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        const photo = await SecureStore.getItemAsync(`userPhoto_${userId}`); // Load isolated user photo
+        
         if (name) setUserName(name);
         if (phone) setUserPhone(phone);
         if (photo) setUserPhoto(photo);
@@ -40,13 +70,36 @@ export default function ProfileScreen() {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
+      base64: true,
     });
 
     if (!result.canceled) {
       const uri = result.assets[0].uri;
-      setUserPhoto(uri);
-      await SecureStore.setItemAsync('userPhoto', uri);
-      Alert.alert("Success!", "Profile picture perfectly updated.");
+      const base64Data = result.assets[0].base64 ? `data:image/jpeg;base64,${result.assets[0].base64}` : uri;
+      setUserPhoto(base64Data);
+      
+      const rawUserId = (userPhone && userPhone !== 'Loading...') ? userPhone : userName;
+      const userId = rawUserId.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+      await SecureStore.setItemAsync(`userPhoto_${userId}`, base64Data);
+      
+      // Cloud Sync
+      try {
+        const token = await SecureStore.getItemAsync('userToken');
+        if (token && result.assets[0].base64) {
+          await fetch("http://172.16.149.4:8000/user/profile", {
+             method: 'PUT',
+             headers: {
+               'Content-Type': 'application/json',
+               'Authorization': `Bearer ${token}`
+             },
+             body: JSON.stringify({ photo_base64: base64Data })
+          });
+        }
+      } catch (e) {
+        console.log("Failed to sync profile explicitly to DB.");
+      }
+
+      Alert.alert("Success!", "Profile uploaded efficiently to Kisansathi Cloud.");
     }
   };
 

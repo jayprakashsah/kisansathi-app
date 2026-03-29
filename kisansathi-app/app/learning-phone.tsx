@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Polyline, Circle } from 'react-native-svg';
 import * as SecureStore from 'expo-secure-store';
 
-const BACKEND_URL = "http://172.16.149.247:8000/field/save";
+const BACKEND_URL = "http://172.16.149.4:8000/field/save";
 
 export default function LearningPhoneScreen() {
   const router = useExpoRouter();

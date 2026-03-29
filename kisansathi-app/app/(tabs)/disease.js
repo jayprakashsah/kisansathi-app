@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as SecureStore from 'expo-secure-store';
 
 export default function DiseaseScanner() {
   const [scans, setScans] = useState([]);
@@ -20,12 +21,17 @@ export default function DiseaseScanner() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // YOUR MAC'S IP ADDRESS
-  const BACKEND_URL = 'http://172.16.149.247:8000/rover/scans';
+  const BACKEND_URL = 'http://172.16.149.4:8000/rover/scans';
 
   // 🚀 FETCH REAL DATA FROM YOUR MONGODB BACKEND 🚀
   const fetchScans = async () => {
     try {
-      const response = await fetch(BACKEND_URL);
+      const token = await SecureStore.getItemAsync('userToken');
+      const response = await fetch(BACKEND_URL, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await response.json();
       
       if (response.ok) {

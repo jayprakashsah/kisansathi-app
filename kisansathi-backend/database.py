@@ -15,4 +15,6 @@ db = client.kisansathi_db
 
 # Define our collections (like tables)
 users_collection = db.users
-rover_collection = db.rover_data
+rover_collection = db.scans  # Unified name for rover scans
+history_collection = db.history # Manual scans history
+fields_collection = db.fields

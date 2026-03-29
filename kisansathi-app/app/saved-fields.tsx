@@ -5,7 +5,7 @@ import Svg, { Polyline, Circle } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const BACKEND_URL = "http://172.16.149.247:8000/field/history";
+const BACKEND_URL = "http://172.16.149.4:8000/field/history";
 
 interface Coordinate {
   latitude: number;

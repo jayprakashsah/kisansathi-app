@@ -20,6 +20,8 @@ export default function RootLayout() {
         <Stack.Screen name="profile" options={{ title: 'My Profile', headerBackTitle: 'Back', headerTintColor: '#4CAF50' }} />
         <Stack.Screen name="saved-fields" options={{ title: 'Path Tracking Repository', headerBackTitle: 'Profile', headerTintColor: '#4CAF50' }} />
         <Stack.Screen name="privacy" options={{ title: 'Privacy Vault', headerBackTitle: 'Profile', headerTintColor: '#4CAF50' }} />
+        <Stack.Screen name="crop-details" options={{ title: 'Crop Analysis', headerBackTitle: 'Back', headerTintColor: '#4CAF50' }} />
+        <Stack.Screen name="plant-scanner" options={{ title: 'Disease Diagnostics', headerBackTitle: 'Back', headerTintColor: '#4CAF50' }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style="auto" />

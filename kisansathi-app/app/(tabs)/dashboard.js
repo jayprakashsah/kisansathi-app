@@ -13,6 +13,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   RefreshControl,
+  Image,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -56,13 +57,29 @@ const dashboardItems = [
     route: '/prediction',
     iconBg: '#81D4FA',
   },
+  {
+    id: '5',
+    title: 'Discovery\nHistory',
+    icon: 'history',
+    gradient: ['#00C853', '#1B5E20'],
+    route: '/history',
+    iconBg: '#69F0AE',
+  },
+  {
+    id: '6',
+    title: 'Disease\nLibrary',
+    icon: 'book-open-variant',
+    gradient: ['#FB8C00', '#E65100'],
+    route: '/learning-mode',
+    iconBg: '#FFB74D',
+  },
 ];
 
 const bottomNavItems = [
   { id: 1, icon: 'home', label: 'Home', active: true, route: '/(tabs)' },
   { id: 2, icon: 'book-open-page-variant', label: 'Learning Mode', route: '/learning-mode' },
   { id: 3, icon: 'chart-bar', label: 'Real World Data & Info', route: '/real-world-data' },
-  { id: 4, icon: 'history', label: 'History', route: null },
+  { id: 4, icon: 'history', label: 'History', route: '/history' },
   { id: 5, icon: 'bell', label: 'Alerts', route: null },
   { id: 6, icon: 'cog', label: 'Settings', route: null },
 ];
@@ -115,6 +132,7 @@ export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [locationName, setLocationName] = useState('Farm Location');
   const [userName, setUserName] = useState('Farmer Kishan');
+  const [userPhoto, setUserPhoto] = useState(null);
 
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -129,8 +147,16 @@ export default function Dashboard() {
 
       // Load user details
       const storedName = await SecureStore.getItemAsync('userName');
+      const storedPhone = await SecureStore.getItemAsync('userPhone');
       if (storedName) {
         setUserName(storedName);
+      }
+      
+      const rawUserId = storedPhone || storedName || 'default';
+      const userId = rawUserId.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+      const storedPhoto = await SecureStore.getItemAsync(`userPhoto_${userId}`);
+      if (storedPhoto) {
+        setUserPhoto(storedPhoto);
       }
 
       // Request location permissions
@@ -383,7 +409,11 @@ export default function Dashboard() {
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                   >
-                    <MaterialCommunityIcons name="account" size={32} color="#FFF" />
+                    {userPhoto ? (
+                      <Image source={{ uri: userPhoto }} style={{ width: 56, height: 56, borderRadius: 28 }} />
+                    ) : (
+                      <MaterialCommunityIcons name="account" size={32} color="#FFF" />
+                    )}
                   </LinearGradient>
                   <View style={styles.notificationBadge}>
                     <Text style={styles.notificationText}>3</Text>
